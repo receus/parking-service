@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/parking_db
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  flyway:
+    enabled: true
+
+  application:
+    name: parking-service
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+
+
