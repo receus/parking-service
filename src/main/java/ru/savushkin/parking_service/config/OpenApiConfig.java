@@ -14,6 +14,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Parking Service API")
                         .version("v1")
-                        .description("Документация для микросервиса парковки"));
+                        .description("Parking Service Documentation")
+                );
     }
 }

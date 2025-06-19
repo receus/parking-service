@@ -1,7 +1,9 @@
 spring:
   profiles:
     active: dev
-
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   jpa:
     hibernate:
       ddl-auto: validate
@@ -19,6 +21,7 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+  override-with-generic-response: false
 
 logging:
   level:
