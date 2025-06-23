@@ -25,7 +25,8 @@ springdoc:
 
 logging:
   level:
-    root: INFO
+    root: WARN
+    ru.savushkin.parking_service: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
 
