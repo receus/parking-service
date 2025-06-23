@@ -26,7 +26,7 @@ springdoc:
 logging:
   level:
     root: INFO
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+#  pattern:
+#    console: ""
 
 

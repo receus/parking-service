@@ -1,0 +1,130 @@
+{
+  "id": null,
+  "uid": "log-dashboard",
+  "title": "Microservice Logs Dashboard",
+  "tags": [
+    "logs",
+    "loki"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 30,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "title": "Log Stream",
+      "type": "logs",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 12
+      },
+      "id": 1,
+      "targets": [
+        {
+          "expr": "{app=\"parking-service\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showLabels": true,
+        "showTime": true,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "dedupStrategy": "none"
+      }
+    },
+    {
+      "title": "Logs per level",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      },
+      "id": 2,
+      "targets": [
+        {
+          "expr": "count_over_time({app=\"parking-service\"} |= \"INFO\" [1m])",
+          "refId": "A",
+          "legendFormat": "INFO"
+        },
+        {
+          "expr": "count_over_time({app=\"parking-service\"} |= \"WARN\" [1m])",
+          "refId": "B",
+          "legendFormat": "WARN"
+        },
+        {
+          "expr": "count_over_time({app=\"parking-service\"} |= \"ERROR\" [1m])",
+          "refId": "C",
+          "legendFormat": "ERROR"
+        }
+      ],
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "points": false,
+      "stack": false,
+      "legend": {
+        "show": true
+      },
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "traceId",
+        "label": "Trace ID",
+        "type": "query",
+        "datasource": "Loki",
+        "refresh": 1,
+        "query": "label_values(traceId)",
+        "includeAll": false,
+        "multi": false
+      },
+      {
+        "name": "userId",
+        "label": "User ID",
+        "type": "query",
+        "datasource": "Loki",
+        "refresh": 1,
+        "query": "label_values(userId)",
+        "includeAll": false,
+        "multi": false
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  }
+}
