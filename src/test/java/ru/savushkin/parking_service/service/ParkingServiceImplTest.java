@@ -8,6 +8,7 @@ import ru.savushkin.parking_service.dto.ParkingEntryRequest;
 import ru.savushkin.parking_service.dto.ParkingExitRequest;
 import ru.savushkin.parking_service.entity.ParkingSession;
 import ru.savushkin.parking_service.entity.VehicleType;
+import ru.savushkin.parking_service.exception.VehicleNotFoundException;
 import ru.savushkin.parking_service.repository.ParkingRepository;
 import ru.savushkin.parking_service.service.impl.ParkingServiceImpl;
 
@@ -17,8 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -79,5 +79,17 @@ public class ParkingServiceImplTest {
         assertFalse(session.isParked());
         verify(parkingRepository).save(session);
     }
+
+    @Test
+    void registerExit_shouldThrowIfVehicleNotFound() {
+        when(parkingRepository.findByVehicleNumberAndParkedTrue("О700АО_70RUS"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(VehicleNotFoundException.class, () ->
+                parkingService.registerExit(new ParkingExitRequest("О700АО_70RUS")));
+
+        verify(parkingRepository, never()).save(any());
+    }
+
 }
 
