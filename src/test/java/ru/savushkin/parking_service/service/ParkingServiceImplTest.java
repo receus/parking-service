@@ -8,6 +8,7 @@ import ru.savushkin.parking_service.dto.ParkingEntryRequest;
 import ru.savushkin.parking_service.dto.ParkingExitRequest;
 import ru.savushkin.parking_service.entity.ParkingSession;
 import ru.savushkin.parking_service.entity.VehicleType;
+import ru.savushkin.parking_service.exception.AlreadyParkedException;
 import ru.savushkin.parking_service.exception.VehicleNotFoundException;
 import ru.savushkin.parking_service.repository.ParkingRepository;
 import ru.savushkin.parking_service.service.impl.ParkingServiceImpl;
@@ -40,6 +41,28 @@ public class ParkingServiceImplTest {
         assertThat(session.getVehicleType()).isEqualTo(VehicleType.CAR);
         assertThat(response.sessionId()).isEqualTo(session.getId());
         assertThat(response.entryTime()).isEqualTo(session.getEntryTime());
+    }
+
+    @Test
+    void registerEntry_shouldThrowIfVehicleAlreadyParked() {
+        String vehicleNumber = "О700АО_70RUS";
+        ParkingSession existing = ParkingSession.builder()
+                .id(UUID.randomUUID())
+                .vehicleNumber(vehicleNumber)
+                .vehicleType(VehicleType.CAR)
+                .entryTime(LocalDateTime.now().minusMinutes(30))
+                .parked(true)
+                .build();
+
+        when(parkingRepository.findByVehicleNumberAndParkedTrue(vehicleNumber))
+                .thenReturn(Optional.of(existing));
+
+        ParkingEntryRequest request = new ParkingEntryRequest(vehicleNumber, VehicleType.CAR);
+
+        assertThrows(AlreadyParkedException.class, () ->
+                parkingService.registerEntry(request));
+
+        verify(parkingRepository, never()).save(any());
     }
 
     @Test
