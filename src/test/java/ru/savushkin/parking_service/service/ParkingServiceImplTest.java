@@ -5,14 +5,20 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import ru.savushkin.parking_service.dto.ParkingEntryRequest;
-import ru.savushkin.parking_service.entry.ParkingSession;
-import ru.savushkin.parking_service.entry.VehicleType;
+import ru.savushkin.parking_service.dto.ParkingExitRequest;
+import ru.savushkin.parking_service.entity.ParkingSession;
+import ru.savushkin.parking_service.entity.VehicleType;
 import ru.savushkin.parking_service.repository.ParkingRepository;
 import ru.savushkin.parking_service.service.impl.ParkingServiceImpl;
 
+import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +46,7 @@ public class ParkingServiceImplTest {
     void registerEntry_shouldFailOnInvalidVehicleType() {
         String json = """
         {
-            "vehicleNumber": "A123BC",
+            "vehicleNumber": "О700АО_70RUS",
             "vehicleType": "moped"
         }
         """;
@@ -52,6 +58,26 @@ public class ParkingServiceImplTest {
         )
                 .isInstanceOf(InvalidFormatException.class)
                 .hasMessageContaining("moped");
+    }
+
+    @Test
+    void registerExit_shouldSaveSessionAndReturnResponse() {
+        var session = ParkingSession.builder()
+                .id(UUID.randomUUID())
+                .vehicleNumber("О700АО_70RUS")
+                .vehicleType(VehicleType.CAR)
+                .entryTime(LocalDateTime.now().minusHours(1))
+                .parked(true)
+                .build();
+
+        when(parkingRepository.findByVehicleNumberAndParkedTrue("О700АО_70RUS"))
+                .thenReturn(Optional.of(session));
+
+        var response = parkingService.registerExit(new ParkingExitRequest("О700АО_70RUS"));
+
+        assertNotNull(response.exitTime());
+        assertFalse(session.isParked());
+        verify(parkingRepository).save(session);
     }
 }
 

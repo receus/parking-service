@@ -1,4 +1,4 @@
-package ru.savushkin.parking_service.entry;
+package ru.savushkin.parking_service.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

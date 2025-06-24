@@ -6,12 +6,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.savushkin.parking_service.dto.ParkingEntryRequest;
 import ru.savushkin.parking_service.dto.ParkingEntryResponse;
+import ru.savushkin.parking_service.dto.ParkingExitRequest;
+import ru.savushkin.parking_service.dto.ParkingExitResponse;
 import ru.savushkin.parking_service.service.ParkingService;
 
 @RestController
@@ -30,5 +29,16 @@ public class ParkingController {
     })
     public ResponseEntity<ParkingEntryResponse> parkingEntry(@RequestBody @Valid ParkingEntryRequest request) {
         return ResponseEntity.ok(parkingService.registerEntry(request));
+    }
+
+    @PostMapping("/exit")
+    @Operation(summary = "Регистрация выезда автомобиля")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Выезд успешно зарегистрирован"),
+            @ApiResponse(responseCode = "404", description = "Машина не найдена или уже выехала"),
+            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+    })
+    public ResponseEntity<ParkingExitResponse> parkingExit(@RequestBody @Valid ParkingExitRequest request) {
+        return ResponseEntity.ok(parkingService.registerExit(request));
     }
 }
