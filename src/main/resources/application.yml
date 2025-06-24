@@ -27,6 +27,7 @@ logging:
   level:
     root: WARN
     ru.savushkin.parking_service: DEBUG
+    org.flywaydb.core: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
 

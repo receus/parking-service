@@ -43,9 +43,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    private ResponseEntity<ErrorResponse> handleDeserialization(HttpMessageNotReadableException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("Неверный формат данных", LocalDateTime.now(), HttpStatus.BAD_REQUEST.value()));
+    private ResponseEntity<?> handleDeserialization(HttpMessageNotReadableException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(AlreadyExitedException.class)
+    private ResponseEntity<?> handleAlreadyExited(AlreadyExitedException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 }
