@@ -31,4 +31,5 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
 
-
+parking:
+  parking-capacity: 100

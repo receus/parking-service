@@ -5,13 +5,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.savushkin.parking_service.dto.ParkingEntryRequest;
-import ru.savushkin.parking_service.dto.ParkingEntryResponse;
-import ru.savushkin.parking_service.dto.ParkingExitRequest;
-import ru.savushkin.parking_service.dto.ParkingExitResponse;
+import ru.savushkin.parking_service.dto.*;
 import ru.savushkin.parking_service.service.ParkingService;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("v1/parking")
@@ -40,5 +41,16 @@ public class ParkingController {
     })
     public ResponseEntity<ParkingExitResponse> parkingExit(@RequestBody @Valid ParkingExitRequest request) {
         return ResponseEntity.ok(parkingService.registerExit(request));
+    }
+
+    @GetMapping("/report")
+    @Operation(summary = "Получить отчет по парковке за период")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Отчет успешно получен")
+    })
+    public ResponseEntity<ParkingReportResponse> parkingReport(
+            @RequestParam("start_date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam("end_date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+        return ResponseEntity.ok(parkingService.getReport(start, end));
     }
 }
