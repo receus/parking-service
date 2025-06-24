@@ -102,5 +102,17 @@ public class ParkingServiceImplTest {
         assertFalse(session.isParked());
         verify(parkingRepository).save(session);
     }
+
+    @Test
+    void registerExit_shouldThrowIfVehicleNotFound() {
+        when(parkingRepository.findByVehicleNumberAndParkedTrue("О700АО_70RUS"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(VehicleNotFoundException.class, () ->
+                parkingService.registerExit(new ParkingExitRequest("О700АО_70RUS")));
+
+        verify(parkingRepository, never()).save(any());
+    }
+
 }
 
