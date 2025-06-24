@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import ru.savushkin.parking_service.config.ParkingProperties;
 import ru.savushkin.parking_service.dto.ParkingEntryRequest;
 import ru.savushkin.parking_service.dto.ParkingExitRequest;
+import ru.savushkin.parking_service.dto.ParkingReportResponse;
 import ru.savushkin.parking_service.entity.ParkingSession;
 import ru.savushkin.parking_service.entity.VehicleType;
 import ru.savushkin.parking_service.exception.AlreadyParkedException;
@@ -13,6 +15,7 @@ import ru.savushkin.parking_service.exception.VehicleNotFoundException;
 import ru.savushkin.parking_service.repository.ParkingRepository;
 import ru.savushkin.parking_service.service.impl.ParkingServiceImpl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Optional;
@@ -26,7 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ParkingServiceImplTest {
 
     private final ParkingRepository parkingRepository = mock(ParkingRepository.class);
-    private final ParkingService parkingService = new ParkingServiceImpl(parkingRepository);
+    private final ParkingProperties parkingProperties = mock(ParkingProperties.class);
+    private final ParkingService parkingService = new ParkingServiceImpl(parkingRepository, parkingProperties);
 
     @Test
     void registerEntry_shouldSaveSessionAndReturnResponse() {
@@ -114,5 +118,22 @@ public class ParkingServiceImplTest {
         verify(parkingRepository, never()).save(any());
     }
 
+    @Test
+    void getReport_shouldReturnCorrectValues() {
+        LocalDateTime start = LocalDateTime.of(2025, 6, 23, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2025, 6, 24, 23, 59, 59);
+
+        when(parkingRepository.countCurrentlyOccupied()).thenReturn(30);
+        when(parkingRepository.findAverageDurationMinutes(start, end))
+                .thenReturn(BigDecimal.valueOf(120.456));
+
+        when(parkingProperties.getParkingCapacity()).thenReturn(100);
+
+        ParkingReportResponse response = parkingService.getReport(start, end);
+
+        assertEquals(30, response.occupiedPlaces());
+        assertEquals(70, response.freePlaces());
+        assertEquals(BigDecimal.valueOf(120.46), response.averageOccupied());
+    }
 }
 
