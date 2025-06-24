@@ -7,7 +7,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.LocalDateTime;
 
@@ -35,13 +34,6 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR,  "Unexpected error: " + ex.getMessage());
     }
 
-    private ResponseEntity<?> buildError(HttpStatus httpStatus, String message) {
-        return new ResponseEntity<>(
-                new ErrorResponse(message, LocalDateTime.now(), httpStatus.value()),
-                httpStatus
-        );
-    }
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     private ResponseEntity<?> handleDeserialization(HttpMessageNotReadableException ex) {
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
@@ -50,5 +42,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AlreadyExitedException.class)
     private ResponseEntity<?> handleAlreadyExited(AlreadyExitedException ex) {
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(AlreadyParkedException.class)
+    private ResponseEntity<?> handleAlreadyParked(AlreadyParkedException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    private ResponseEntity<?> buildError(HttpStatus httpStatus, String message) {
+        return new ResponseEntity<>(
+                new ErrorResponse(message, LocalDateTime.now(), httpStatus.value()),
+                httpStatus
+        );
     }
 }

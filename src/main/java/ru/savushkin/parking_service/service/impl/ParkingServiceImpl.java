@@ -9,6 +9,7 @@ import ru.savushkin.parking_service.dto.ParkingExitRequest;
 import ru.savushkin.parking_service.dto.ParkingExitResponse;
 import ru.savushkin.parking_service.entity.ParkingSession;
 import ru.savushkin.parking_service.exception.AlreadyExitedException;
+import ru.savushkin.parking_service.exception.AlreadyParkedException;
 import ru.savushkin.parking_service.exception.VehicleNotFoundException;
 import ru.savushkin.parking_service.repository.ParkingRepository;
 import ru.savushkin.parking_service.service.ParkingService;
@@ -27,6 +28,11 @@ public class ParkingServiceImpl implements ParkingService {
     @Override
     public ParkingEntryResponse registerEntry(ParkingEntryRequest request) {
         String normalizedNumber = request.vehicleNumber().toUpperCase(Locale.ROOT);
+
+        repository.findByVehicleNumberAndParkedTrue(normalizedNumber)
+                .ifPresent(session -> {
+                    throw new AlreadyParkedException("Vehicle already parked: " + normalizedNumber);
+                });
 
         ParkingSession session = ParkingSession.builder()
                 .id(UUID.randomUUID())
